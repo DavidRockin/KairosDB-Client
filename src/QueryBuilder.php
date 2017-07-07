@@ -19,7 +19,7 @@ class QueryBuilder
      */
     public function addMetric($metricName)
     {
-        if ($this->currentMetric) {
+        if (!empty($this->currentMetric)) {
             $this->metrics[] = $this->currentMetric;
             $this->currentMetric = [];
         }
@@ -27,6 +27,50 @@ class QueryBuilder
         $this->currentMetric['name'] = $metricName;
 
         return $this;
+    }
+
+    /**
+    * @param string $name
+    * @param array $sampling
+    * @return $this
+    */
+    public function addAggregator($name, $sampling = [])
+    {
+        if (!isset($this->currentMetric['aggregators']))
+            $this->currentMetric['aggregators'] = [];
+        $this->currentMetric['aggregators'][] = [
+            'name'     => $name,
+            'sampling' => $sampling,
+        ];
+
+        return $this;
+    }
+
+    /**
+    * @param array $sampling
+    * @return $this
+    */
+    public function max($value, $unit)
+    {
+        return $this->addAggregator('max', ['value' => $value, 'unit' => $unit]);
+    }
+
+    /**
+    * @param array $sampling
+    * @return $this
+    */
+    public function min($value, $unit)
+    {
+        return $this->addAggregator('min', ['value' => $value, 'unit' => $unit]);
+    }
+
+    /**
+    * @param array $sampling
+    * @return $this
+    */
+    public function avg($value, $unit)
+    {
+        return $this->addAggregator('avg', ['value' => $value, 'unit' => $unit]);
     }
 
     /**
@@ -150,4 +194,4 @@ class QueryBuilder
             $this->query["{$type}_absolute"] = $limits;
         }
     }
-} 
+}
